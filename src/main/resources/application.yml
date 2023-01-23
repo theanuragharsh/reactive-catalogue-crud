@@ -13,16 +13,18 @@ management:
     web:
       exposure:
         include: health, info, metrics
-# Datasource Configurations
-h2:
-  console:
-    enabled: true
-    path: /h2
 
-# R2DBC Configuration
-r2dbc:
-  url: r2dbc:h2:mem:///cataloguedb
-  username: sa
-  password:
-  initialization-mode: always
+spring:
+  resources:
+    add-mappings: false
+  h2:
+    console:
+      enabled: true
+      path: /h2
 
+  # R2DBC Configuration
+  r2dbc:
+    url: r2dbc:h2:mem:///cataloguedb
+    username: sa
+    password:
+    initialization-mode: always
