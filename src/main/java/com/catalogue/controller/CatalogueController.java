@@ -20,7 +20,7 @@ public class CatalogueController {
 
     private final CatalogueService catalogueService;
 
-    @GetMapping(path = CatalogueControllerAPIPaths.GET_ITEMS_STREAM, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(path = CatalogueControllerAPIPaths.GET_ITEMS_STREAM, produces = MediaType.APPLICATION_NDJSON_VALUE)
     @ResponseStatus(value = HttpStatus.OK)
     public Flux<CatalogueItem> getCatalogueItems() {
         return catalogueService.getCatalogueItems();
