@@ -25,6 +25,11 @@ spring:
   # R2DBC Configuration
   r2dbc:
     url: r2dbc:h2:mem:///cataloguedb
-    username: sa
-    password:
+    username: 'sa'
+    password: ''
     initialization-mode: always
+  datasource:
+    url: 'jdbc:h2:mem:cataloguedb'
+    driverClassName: org.h2.Driver
+    username: 'sa'
+    password: ''

@@ -19,11 +19,14 @@ public class CatalogueServiceImpl implements CatalogueService {
     @Override
     public Flux<CatalogueItem> getCatalogueItems() {
         return catalogueRepository.findAll()
-                .switchIfEmpty(Mono.error(new ClassNotFoundException("ABC")));
-//        .switchIfEmpty(Mono.defer(() -> {
-//            log.warn("No data found in database");
-//            return Mono.empty();
-//        }));
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.warn("No data found in database");
+                    return Mono.empty();
+                }));
+    }
 
+    @Override
+    public Mono<CatalogueItem> createCatalogueItem(CatalogueItem catalogueItem) {
+        return catalogueRepository.save(catalogueItem);
     }
 }
