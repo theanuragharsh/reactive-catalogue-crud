@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
+@Builder
 @AllArgsConstructor
 @RequiredArgsConstructor(staticName = "of")
 @Table("CATALOGUE_ITEMS")

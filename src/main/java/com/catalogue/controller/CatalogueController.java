@@ -1,5 +1,6 @@
 package com.catalogue.controller;
 
+import com.catalogue.dto.CatalogueResponseDto;
 import com.catalogue.models.CatalogueItem;
 import com.catalogue.service.CatalogueService;
 import jakarta.validation.Valid;
@@ -15,7 +16,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(CatalogueControllerAPIPaths.BASE_PATH)
+@RequestMapping(CatalogueControllerApiPaths.BASE_PATH)
 public class CatalogueController {
 
     private final CatalogueService catalogueService;
@@ -25,9 +26,9 @@ public class CatalogueController {
      *
      * @return catalogueItems
      */
-    @GetMapping(path = CatalogueControllerAPIPaths.GET_ITEMS_STREAM, produces = MediaType.APPLICATION_NDJSON_VALUE)
+    @GetMapping(path = CatalogueControllerApiPaths.GET_ITEMS_STREAM, produces = MediaType.APPLICATION_NDJSON_VALUE)
     @ResponseStatus(value = HttpStatus.OK)
-    public Flux<CatalogueItem> getCatalogueItems() {
+    public Flux<CatalogueResponseDto> getCatalogueItems() {
         return catalogueService.getCatalogueItems();
     }
 
@@ -38,9 +39,9 @@ public class CatalogueController {
      * @return created CatalogueItem
      */
     @ResponseStatus(value = HttpStatus.CREATED)
-    @PostMapping(path = CatalogueControllerAPIPaths.CREATE)
+    @PostMapping(path = CatalogueControllerApiPaths.CREATE)
     public Mono<ResponseEntity> createCatalogueItem(@RequestBody(required = true) @Valid CatalogueItem catalogueItem) {
         return catalogueService.createCatalogueItem(catalogueItem)
-                .map(item -> ResponseEntity.status(HttpStatus.CREATED).body(catalogueItem));
+                .map(item -> ResponseEntity.status(HttpStatus.CREATED).body(catalogueItem.getId()));
     }
 }

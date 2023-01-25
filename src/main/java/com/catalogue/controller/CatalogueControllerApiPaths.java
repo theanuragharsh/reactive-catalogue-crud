@@ -3,7 +3,7 @@ package com.catalogue.controller;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CatalogueControllerAPIPaths {
+public class CatalogueControllerApiPaths {
 
     public static final String BASE_PATH = "/api/v1";
 
