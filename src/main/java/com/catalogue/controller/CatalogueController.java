@@ -20,16 +20,27 @@ public class CatalogueController {
 
     private final CatalogueService catalogueService;
 
+    /**
+     * Get Catalogue Items available in database
+     *
+     * @return catalogueItems
+     */
     @GetMapping(path = CatalogueControllerAPIPaths.GET_ITEMS_STREAM, produces = MediaType.APPLICATION_NDJSON_VALUE)
     @ResponseStatus(value = HttpStatus.OK)
     public Flux<CatalogueItem> getCatalogueItems() {
         return catalogueService.getCatalogueItems();
     }
 
+    /**
+     * Create Catalogue Item
+     *
+     * @param catalogueItem
+     * @return created CatalogueItem
+     */
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping(path = CatalogueControllerAPIPaths.CREATE)
     public Mono<ResponseEntity> createCatalogueItem(@RequestBody(required = true) @Valid CatalogueItem catalogueItem) {
         return catalogueService.createCatalogueItem(catalogueItem)
-                .map(catalogueItem1 -> ResponseEntity.status(HttpStatus.CREATED).body(catalogueItem));
+                .map(item -> ResponseEntity.status(HttpStatus.CREATED).body(catalogueItem));
     }
 }
