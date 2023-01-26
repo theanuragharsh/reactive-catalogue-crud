@@ -2,13 +2,18 @@ package com.catalogue.models;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 @Builder
@@ -38,8 +43,9 @@ public class CatalogueItem {
     @NotNull
     private Integer inventory;
     @Column(value = "CREATED_ON")
-    @NotNull
-    private LocalDateTime created_on;
+    @CreatedDate
+    private LocalDateTime createdOn;
     @Column(value = "UPDATED_ON")
-    private LocalDateTime updated_on;
+    @LastModifiedDate
+    private Instant updatedOn;
 }

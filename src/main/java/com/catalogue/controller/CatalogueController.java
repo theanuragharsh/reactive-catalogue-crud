@@ -3,7 +3,6 @@ package com.catalogue.controller;
 import com.catalogue.dto.CatalogueResponseDto;
 import com.catalogue.models.CatalogueItem;
 import com.catalogue.service.CatalogueService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -40,7 +39,7 @@ public class CatalogueController {
      */
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping(path = CatalogueControllerApiPaths.CREATE)
-    public Mono<ResponseEntity> createCatalogueItem(@RequestBody(required = true) @Valid CatalogueItem catalogueItem) {
+    public Mono<ResponseEntity> createCatalogueItem(@RequestBody(required = true) CatalogueItem catalogueItem) {
         return catalogueService.createCatalogueItem(catalogueItem)
                 .map(item -> ResponseEntity.status(HttpStatus.CREATED).body(catalogueItem.getId()));
     }

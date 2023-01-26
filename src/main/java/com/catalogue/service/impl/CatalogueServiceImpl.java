@@ -19,23 +19,6 @@ public class CatalogueServiceImpl implements CatalogueService {
 
     private final CatalogueRepository catalogueRepository;
 
-    /*@Override
-    public Flux<CatalogueItem> getCatalogueItems() {
-        return catalogueRepository.findAll()
-                .switchIfEmpty(Mono.defer(() -> {
-                    log.warn("No data found in database");
-                    return Mono.empty();
-                }));
-//                .map(catalogueItem -> {
-//                    CatalogueResponseDto catalogueResponseDto = new CatalogueResponseDto();
-//                    return CatalogueResponseDto.builder()
-//                            .id(catalogueItem.getId()).sku(catalogueItem.getSku()).name(catalogueItem.getName())
-//                            .description(catalogueItem.getDescription()).price(catalogueItem.getPrice())
-//                            .build();
-//                });
-    }*/
-
-
     @Override
     public Flux<CatalogueResponseDto> getCatalogueItems() {
         return catalogueRepository.findAll()
@@ -51,12 +34,13 @@ public class CatalogueServiceImpl implements CatalogueService {
                         .description(catalogueItem.getDescription())
                         .category(catalogueItem.getCategory())
                         .price(catalogueItem.getPrice())
+                        .updatedOn(catalogueItem.getUpdatedOn())
                         .build()
                 );
     }
 
     @Override
     public Mono<CatalogueItem> createCatalogueItem(CatalogueItem catalogueItem) {
-        return catalogueRepository.save(catalogueItem);
+        return catalogueRepository.save(catalogueItem).log();
     }
 }

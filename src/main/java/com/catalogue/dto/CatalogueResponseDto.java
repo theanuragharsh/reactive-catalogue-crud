@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,4 +19,6 @@ public class CatalogueResponseDto {
     private String description;
     private String category;
     private Double price;
+    private Instant updatedOn;
+
 }
