@@ -10,4 +10,6 @@ public interface CatalogueService {
     Flux<CatalogueResponseDto> getCatalogueItems();
 
     Mono<CatalogueItem> createCatalogueItem(CatalogueItem catalogueItem);
+
+    Mono<CatalogueResponseDto> findById(Long id);
 }

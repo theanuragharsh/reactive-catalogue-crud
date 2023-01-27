@@ -18,13 +18,15 @@ import reactor.core.publisher.Mono;
 public class CatalogueServiceImpl implements CatalogueService {
 
     private final CatalogueRepository catalogueRepository;
+    private static final String DATABASE_EMPTY = "Database Empty";
+    private static final String CONTENT_NOT_FOUND = "The provided Id does not matches";
 
     @Override
     public Flux<CatalogueResponseDto> getCatalogueItems() {
         return catalogueRepository.findAll()
                 .switchIfEmpty(Mono.defer(() -> {
-                            log.warn("Database Empty");
-                            return Mono.error(new ItemNotFoundException(HttpStatus.NO_CONTENT, "Database Empty"));
+                            log.warn(DATABASE_EMPTY);
+                            return Mono.error(new ItemNotFoundException(HttpStatus.NO_CONTENT, DATABASE_EMPTY));
                         })
                 )
                 .map(catalogueItem -> CatalogueResponseDto.builder()
@@ -42,5 +44,20 @@ public class CatalogueServiceImpl implements CatalogueService {
     @Override
     public Mono<CatalogueItem> createCatalogueItem(CatalogueItem catalogueItem) {
         return catalogueRepository.save(catalogueItem).log();
+    }
+
+    @Override
+    public Mono<CatalogueResponseDto> findById(Long id) {
+        return catalogueRepository.findById(id).switchIfEmpty(Mono.defer(() -> {
+            log.warn("CONTENT_NOT_FOUND", id);
+            return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, CONTENT_NOT_FOUND));
+        })).map(catalogueItem -> CatalogueResponseDto.builder().id(catalogueItem.getId())
+                .sku(catalogueItem.getSku())
+                .name(catalogueItem.getName())
+                .description(catalogueItem.getDescription())
+                .category(catalogueItem.getCategory())
+                .price(catalogueItem.getPrice())
+                .updatedOn(catalogueItem.getUpdatedOn())
+                .build());
     }
 }

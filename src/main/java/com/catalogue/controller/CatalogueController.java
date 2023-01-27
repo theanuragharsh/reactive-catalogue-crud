@@ -1,6 +1,7 @@
 package com.catalogue.controller;
 
 import com.catalogue.dto.CatalogueResponseDto;
+import com.catalogue.mapper.CatalogueMapper;
 import com.catalogue.models.CatalogueItem;
 import com.catalogue.service.CatalogueService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import reactor.core.publisher.Mono;
 public class CatalogueController {
 
     private final CatalogueService catalogueService;
+    private final CatalogueMapper catalogueMapper;
 
     /**
      * Get Catalogue Items available in database
@@ -37,10 +39,29 @@ public class CatalogueController {
      * @param catalogueItem
      * @return created CatalogueItem
      */
+
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping(path = CatalogueControllerApiPaths.CREATE)
-    public Mono<ResponseEntity> createCatalogueItem(@RequestBody(required = true) CatalogueItem catalogueItem) {
+    public Mono<ResponseEntity<CatalogueResponseDto>> createCatalogueItem(@RequestBody CatalogueItem catalogueItem) {
         return catalogueService.createCatalogueItem(catalogueItem)
-                .map(item -> ResponseEntity.status(HttpStatus.CREATED).body(catalogueItem.getId()));
+                .map(item -> new ResponseEntity<>(catalogueMapper.toCatalogueResponse(catalogueItem), HttpStatus.CREATED));
+//                        CatalogueResponseDto.builder()
+//                        .id(catalogueItem.getId())
+//                        .sku(catalogueItem.getSku())
+//                        .name(catalogueItem.getName())
+//                        .build(), HttpStatus.CREATED)
+//                );
+    }
+
+    /**
+     * Create Catalogue Item
+     *
+     * @param id
+     * @return created CatalogueItem
+     */
+    @ResponseStatus(value = HttpStatus.OK)
+    @GetMapping(path = CatalogueControllerApiPaths.GET_ITEM_BY_ID, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Mono<CatalogueResponseDto> findById(@PathVariable Long id) {
+        return catalogueService.findById(id);
     }
 }

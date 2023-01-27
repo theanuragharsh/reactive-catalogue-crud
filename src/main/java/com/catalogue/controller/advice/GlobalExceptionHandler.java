@@ -5,7 +5,6 @@ import com.catalogue.exceptions.ItemNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -24,7 +23,8 @@ public class GlobalExceptionHandler extends RuntimeException {
     @ExceptionHandler(value = ItemNotFoundException.class)
     public ResponseEntity<HashMap<String, ApiError>> itemNotFoundException(ItemNotFoundException itemNotFoundException) {
         HashMap<String, List<ApiError>> errors = new HashMap<>();
-        ApiError apiError = ApiError.builder().category(API_ERROR).status(HttpStatus.NO_CONTENT).message(itemNotFoundException.getReason()).timestamp(LocalDateTime.now()).build();
+        ApiError apiError = ApiError.builder().category(API_ERROR).status(HttpStatus.NO_CONTENT)
+                .message(itemNotFoundException.getReason()).timestamp(LocalDateTime.now()).build();
         errors.put(ERRORS, List.of(apiError));
         return new ResponseEntity(errors, itemNotFoundException.getStatusCode());
     }
