@@ -1,13 +1,15 @@
 package com.catalogue.service.impl;
 
-import com.catalogue.dto.CatalogueResponseDto;
+import com.catalogue.dto.CatalogueItemResponse;
 import com.catalogue.exceptions.ItemNotFoundException;
+import com.catalogue.mapper.CatalogueMapper;
 import com.catalogue.models.CatalogueItem;
 import com.catalogue.repository.CatalogueRepository;
 import com.catalogue.service.CatalogueService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,46 +20,55 @@ import reactor.core.publisher.Mono;
 public class CatalogueServiceImpl implements CatalogueService {
 
     private final CatalogueRepository catalogueRepository;
+    private final CatalogueMapper catalogueMapper;
     private static final String DATABASE_EMPTY = "Database Empty";
-    private static final String CONTENT_NOT_FOUND = "The provided Id does not matches";
 
     @Override
-    public Flux<CatalogueResponseDto> getCatalogueItems() {
+    public Flux<CatalogueItemResponse> getCatalogueItems() {
         return catalogueRepository.findAll()
                 .switchIfEmpty(Mono.defer(() -> {
                             log.warn(DATABASE_EMPTY);
                             return Mono.error(new ItemNotFoundException(HttpStatus.NO_CONTENT, DATABASE_EMPTY));
                         })
                 )
-                .map(catalogueItem -> CatalogueResponseDto.builder()
+                .map(catalogueItem -> CatalogueItemResponse.builder()
                         .id(catalogueItem.getId())
                         .sku(catalogueItem.getSku())
                         .name(catalogueItem.getName())
                         .description(catalogueItem.getDescription())
                         .category(catalogueItem.getCategory())
                         .price(catalogueItem.getPrice())
+                        .createdOn(catalogueItem.getCreatedOn())
                         .updatedOn(catalogueItem.getUpdatedOn())
                         .build()
                 );
     }
 
     @Override
-    public Mono<CatalogueItem> createCatalogueItem(CatalogueItem catalogueItem) {
-        return catalogueRepository.save(catalogueItem).log();
+    public Mono<ResponseEntity<CatalogueItemResponse>> createCatalogueItem(CatalogueItem catalogueItem) {
+        return catalogueRepository.save(catalogueItem).map(item -> {
+            log.info("Catalogue_Item_Created");
+            return new ResponseEntity<>(catalogueMapper
+                    .toCatalogueResponse(catalogueItem), HttpStatus.CREATED);
+        });
     }
 
     @Override
-    public Mono<CatalogueResponseDto> findById(Long id) {
+    public Mono<CatalogueItemResponse> findById(Long id) {
         return catalogueRepository.findById(id).switchIfEmpty(Mono.defer(() -> {
-            log.warn("CONTENT_NOT_FOUND", id);
-            return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, CONTENT_NOT_FOUND));
-        })).map(catalogueItem -> CatalogueResponseDto.builder().id(catalogueItem.getId())
-                .sku(catalogueItem.getSku())
-                .name(catalogueItem.getName())
-                .description(catalogueItem.getDescription())
-                .category(catalogueItem.getCategory())
-                .price(catalogueItem.getPrice())
-                .updatedOn(catalogueItem.getUpdatedOn())
-                .build());
+            log.warn("Catalogue Item {} was not found...processing", id);
+            return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found"));
+        })).map(catalogueItem -> {
+            log.info("Catalogue Item {} found", id);
+            return CatalogueItemResponse.builder().id(catalogueItem.getId())
+                    .sku(catalogueItem.getSku())
+                    .name(catalogueItem.getName())
+                    .description(catalogueItem.getDescription())
+                    .category(catalogueItem.getCategory())
+                    .price(catalogueItem.getPrice())
+                    .createdOn(catalogueItem.getCreatedOn())
+                    .updatedOn(catalogueItem.getUpdatedOn())
+                    .build();
+        });
     }
 }

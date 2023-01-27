@@ -13,7 +13,6 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -24,28 +23,28 @@ public class CatalogueItem {
 
     @Id
     private Long id;
+    @NotNull
     @Column(value = "SKU_NUMBER")
-    @NotNull
     private String sku;
+    @NotEmpty
     @Column(value = "ITEM_NAME")
-    @NotEmpty
     private String name;
+    @NotEmpty
     @Column(value = "DESCRIPTION")
-    @NotEmpty
     private String description;
-    @Column(value = "CATEGORY")
     @NotEmpty
+    @Column(value = "CATEGORY")
     private String category;
+    @NotNull
     @Column(value = "PRICE")
-    @NotNull
     private Double price;
-    @Column(value = "INVENTORY")
     @NotNull
+    @Column(value = "INVENTORY")
     private Integer inventory;
-    @Column(value = "CREATED_ON")
     @CreatedDate
-    private LocalDateTime createdOn;
-    @Column(value = "UPDATED_ON")
+    @Column(value = "CREATED_ON")
+    private Instant createdOn;
     @LastModifiedDate
+    @Column(value = "UPDATED_ON")
     private Instant updatedOn;
 }

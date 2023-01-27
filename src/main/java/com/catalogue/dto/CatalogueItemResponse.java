@@ -11,7 +11,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CatalogueResponseDto {
+public class CatalogueItemResponse {
 
     private Long id;
     private String sku;
@@ -19,6 +19,7 @@ public class CatalogueResponseDto {
     private String description;
     private String category;
     private Double price;
+    private Instant createdOn;
     private Instant updatedOn;
 
 }
