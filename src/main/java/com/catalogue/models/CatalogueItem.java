@@ -47,4 +47,5 @@ public class CatalogueItem {
     @LastModifiedDate
     @Column(value = "UPDATED_ON")
     private Instant updatedOn;
+
 }

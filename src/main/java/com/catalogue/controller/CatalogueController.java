@@ -22,6 +22,7 @@ public class CatalogueController {
 
     /**
      * Get Catalogue Items available in database
+     *
      * @return catalogueItems
      */
     @GetMapping(path = CatalogueControllerApiPaths.GET_ITEMS_STREAM, produces = MediaType.APPLICATION_NDJSON_VALUE)
@@ -32,6 +33,7 @@ public class CatalogueController {
 
     /**
      * Create Catalogue Item
+     *
      * @param catalogueItem
      * @return created CatalogueItem
      */
@@ -44,11 +46,12 @@ public class CatalogueController {
 
     /**
      * Create Catalogue Item
+     *
      * @param id
      * @return created CatalogueItem
      */
     @ResponseStatus(value = HttpStatus.OK)
-    @GetMapping(path = CatalogueControllerApiPaths.GET_ITEM_BY_ID, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(path = CatalogueControllerApiPaths.GET_ITEM_BY_ID, produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Mono<CatalogueItemResponse> findById(@PathVariable Long id) {
         return catalogueService.findById(id);
     }

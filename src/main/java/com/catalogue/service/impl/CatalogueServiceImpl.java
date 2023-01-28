@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+import java.util.function.Function;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -30,17 +33,7 @@ public class CatalogueServiceImpl implements CatalogueService {
                             return Mono.error(new ItemNotFoundException(HttpStatus.NO_CONTENT, "Database Empty"));
                         })
                 )
-                .map(catalogueItem -> CatalogueItemResponse.builder()
-                        .id(catalogueItem.getId())
-                        .sku(catalogueItem.getSku())
-                        .name(catalogueItem.getName())
-                        .description(catalogueItem.getDescription())
-                        .category(catalogueItem.getCategory())
-                        .price(catalogueItem.getPrice())
-                        .createdOn(catalogueItem.getCreatedOn())
-                        .updatedOn(catalogueItem.getUpdatedOn())
-                        .build()
-                );
+                .map(buildCatalogueItemResponseFromItemFunction());
     }
 
     @Override
@@ -60,15 +53,24 @@ public class CatalogueServiceImpl implements CatalogueService {
         })).map(catalogueItem -> {
             log.info("Catalogue Item {} found", id);
             return catalogueMapper.toCatalogueResponse(catalogueItem);
-     /*       return CatalogueItemResponse.builder().id(catalogueItem.getId())
-                    .sku(catalogueItem.getSku())
-                    .name(catalogueItem.getName())
-                    .description(catalogueItem.getDescription())
-                    .category(catalogueItem.getCategory())
-                    .price(catalogueItem.getPrice())
-                    .createdOn(catalogueItem.getCreatedOn())
-                    .updatedOn(catalogueItem.getUpdatedOn())
-                    .build();*/
         });
     }
+
+    /**
+     * @return Function to map CatalogueItem into CatalogueItemResponse object using builder pattern
+     */
+    private final Function<CatalogueItem, CatalogueItemResponse> buildCatalogueItemResponseFromItemFunction() {
+        return catalogueItem ->
+                CatalogueItemResponse.builder()
+                        .id(catalogueItem.getId())
+                        .category(catalogueItem.getCategory())
+                        .sku(catalogueItem.getSku())
+                        .description(catalogueItem.getDescription())
+                        .name(catalogueItem.getName())
+                        .price(catalogueItem.getPrice())
+                        .createdOn(catalogueItem.getCreatedOn())
+                        .updatedOn(catalogueItem.getUpdatedOn())
+                        .build();
+    }
 }
+
