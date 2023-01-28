@@ -21,14 +21,13 @@ public class CatalogueServiceImpl implements CatalogueService {
 
     private final CatalogueRepository catalogueRepository;
     private final CatalogueMapper catalogueMapper;
-    private static final String DATABASE_EMPTY = "Database Empty";
 
     @Override
     public Flux<CatalogueItemResponse> getCatalogueItems() {
         return catalogueRepository.findAll()
                 .switchIfEmpty(Mono.defer(() -> {
-                            log.warn(DATABASE_EMPTY);
-                            return Mono.error(new ItemNotFoundException(HttpStatus.NO_CONTENT, DATABASE_EMPTY));
+                            log.warn("Database Empty");
+                            return Mono.error(new ItemNotFoundException(HttpStatus.NO_CONTENT, "Database Empty"));
                         })
                 )
                 .map(catalogueItem -> CatalogueItemResponse.builder()
@@ -47,7 +46,7 @@ public class CatalogueServiceImpl implements CatalogueService {
     @Override
     public Mono<ResponseEntity<CatalogueItemResponse>> createCatalogueItem(CatalogueItem catalogueItem) {
         return catalogueRepository.save(catalogueItem).map(item -> {
-            log.info("Catalogue_Item_Created");
+            log.info("Catalogue Item : {} Created", catalogueItem.getId());
             return new ResponseEntity<>(catalogueMapper
                     .toCatalogueResponse(catalogueItem), HttpStatus.CREATED);
         });
@@ -60,7 +59,8 @@ public class CatalogueServiceImpl implements CatalogueService {
             return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found"));
         })).map(catalogueItem -> {
             log.info("Catalogue Item {} found", id);
-            return CatalogueItemResponse.builder().id(catalogueItem.getId())
+            return catalogueMapper.toCatalogueResponse(catalogueItem);
+     /*       return CatalogueItemResponse.builder().id(catalogueItem.getId())
                     .sku(catalogueItem.getSku())
                     .name(catalogueItem.getName())
                     .description(catalogueItem.getDescription())
@@ -68,7 +68,7 @@ public class CatalogueServiceImpl implements CatalogueService {
                     .price(catalogueItem.getPrice())
                     .createdOn(catalogueItem.getCreatedOn())
                     .updatedOn(catalogueItem.getUpdatedOn())
-                    .build();
+                    .build();*/
         });
     }
 }
