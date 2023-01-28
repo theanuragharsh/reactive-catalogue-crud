@@ -55,4 +55,10 @@ public class CatalogueController {
     public Mono<CatalogueItemResponse> findById(@PathVariable Long id) {
         return catalogueService.findById(id);
     }
+
+    @ResponseStatus(value = HttpStatus.OK)
+    @GetMapping(path = CatalogueControllerApiPaths.GET_ITEM_BY_SKU)
+    public Mono<CatalogueItemResponse> findBySku(@PathVariable String sku) {
+        return catalogueService.findBySku(sku);
+    }
 }

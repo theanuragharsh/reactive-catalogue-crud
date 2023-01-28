@@ -13,4 +13,6 @@ public interface CatalogueService {
     Mono<ResponseEntity<CatalogueItemResponse>> createCatalogueItem(CatalogueItem catalogueItem);
 
     Mono<CatalogueItemResponse> findById(Long id);
+
+    Mono<CatalogueItemResponse> findBySku(String sku);
 }
