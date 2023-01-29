@@ -45,10 +45,10 @@ public class CatalogueController {
     }
 
     /**
-     * Create Catalogue Item
+     * Find By id
      *
      * @param id
-     * @return created CatalogueItem
+     * @return CatalogueItem
      */
     @ResponseStatus(value = HttpStatus.OK)
     @GetMapping(path = CatalogueControllerApiPaths.GET_ITEM_BY_ID, produces = MediaType.APPLICATION_NDJSON_VALUE)
@@ -56,6 +56,12 @@ public class CatalogueController {
         return catalogueService.findById(id);
     }
 
+    /**
+     * Find By sku
+     *
+     * @param sku
+     * @return CatalogueItem
+     */
     @ResponseStatus(value = HttpStatus.OK)
     @GetMapping(path = CatalogueControllerApiPaths.GET_ITEM_BY_SKU)
     public Mono<CatalogueItemResponse> findBySku(@PathVariable String sku) {

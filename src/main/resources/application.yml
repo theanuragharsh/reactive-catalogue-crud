@@ -4,7 +4,6 @@ info:
     name: Catalogue Management System
     description: Catalogue Management System REST APIs Using Spring-Webflux
     version: 1.0.0
-
 server:
   port: 8081
 # Spring boot actuator configurations
