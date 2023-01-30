@@ -48,7 +48,7 @@ public class CatalogueServiceImpl implements CatalogueService {
     @Override
     public Mono<CatalogueItemResponse> findById(Long id) {
         return catalogueRepository.findById(id).switchIfEmpty(Mono.defer(() -> {
-            log.warn("Catalogue Item {} was not found...processing", id);
+            log.warn("Catalogue Item {} was not found", id);
             return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found"));
         })).map(catalogueItem -> {
             log.info("Catalogue Item {} found", id);
@@ -59,7 +59,7 @@ public class CatalogueServiceImpl implements CatalogueService {
     @Override
     public Mono<CatalogueItemResponse> findBySku(String sku) {
         return catalogueRepository.findBySku(sku).switchIfEmpty(Mono.defer(() -> {
-            log.warn("Catalogue Item {} was not found...processing", sku);
+            log.warn("Catalogue Item {} was not found", sku);
             return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found"));
         })).map(catalogueItem -> {
             log.info("Catalogue Item {} found", sku);
@@ -84,7 +84,7 @@ public class CatalogueServiceImpl implements CatalogueService {
     public Mono<CatalogueItemResponse> updateCatalogueItem(String sku, CatalogueItem catalogueItem) {
         return catalogueRepository.findBySku(sku)
                 .switchIfEmpty(Mono.defer(() -> {
-                    log.warn("Catalogue Item {} was not found...processing", sku);
+                    log.warn("Catalogue Item {} was not found", sku);
                     return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found"));
                 }))
                 .doOnNext(existingItem -> {
@@ -97,9 +97,23 @@ public class CatalogueServiceImpl implements CatalogueService {
     }
 
     /**
+     * This method deletes a {@link CatalogueItem} from the repository based on the sku.
+     *
+     * @param sku The sku of the {@link CatalogueItem} to be deleted.
+     * @return A Mono of type Void, which returns an empty Mono if the item was successfully deleted,
+     * or a Mono error if the item with the specified sku was not found.
+     */
+    @Override
+    public Mono<Void> removeCatalogueItem(String sku) {
+        return catalogueRepository.deleteBySku(sku)
+                .doOnError(ItemNotFoundException.class, ex -> log.warn("Catalogue Item {} was not found", sku))
+                .then();
+    }
+
+    /**
      * @return Function to map CatalogueItem into CatalogueItemResponse object using builder pattern
      */
-    private final Function<CatalogueItem, CatalogueItemResponse> buildCatalogueItemResponseFromItemFunction() {
+    private Function<CatalogueItem, CatalogueItemResponse> buildCatalogueItemResponseFromItemFunction() {
         return catalogueItem ->
                 CatalogueItemResponse.builder()
                         .id(catalogueItem.getId())

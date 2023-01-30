@@ -17,4 +17,6 @@ public interface CatalogueService {
     Mono<CatalogueItemResponse> findBySku(String sku);
 
     Mono<CatalogueItemResponse> updateCatalogueItem(String sku, CatalogueItem catalogueItem);
+
+    Mono<Void> removeCatalogueItem(String sku);
 }

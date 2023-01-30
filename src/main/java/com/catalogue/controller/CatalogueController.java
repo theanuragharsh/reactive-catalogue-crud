@@ -26,7 +26,7 @@ public class CatalogueController {
      *
      * @return catalogueItems
      */
-    @GetMapping(path = CatalogueControllerApiPaths.GET_ITEMS_STREAM, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(path = CatalogueControllerApiPaths.GET_ITEMS_STREAM, produces = MediaType.APPLICATION_NDJSON_VALUE)
     @ResponseStatus(value = HttpStatus.OK)
     public Flux<CatalogueItemResponse> findAllCatalogueItems() {
         return catalogueService.getCatalogueItems();
@@ -80,5 +80,16 @@ public class CatalogueController {
     @PutMapping(path = CatalogueControllerApiPaths.UPDATE)
     public Mono<CatalogueItemResponse> updateCatalogueItem(@PathVariable String sku, @RequestBody CatalogueItem catalogueItem) {
         return catalogueService.updateCatalogueItem(sku, catalogueItem);
+    }
+
+    /**
+     * Delete Catalogue Item by SKU
+     *
+     * @param sku
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @DeleteMapping(CatalogueControllerApiPaths.DELETE)
+    public Mono<Void> removeCatalogueItem(@PathVariable String sku) {
+        return catalogueService.removeCatalogueItem(sku);
     }
 }

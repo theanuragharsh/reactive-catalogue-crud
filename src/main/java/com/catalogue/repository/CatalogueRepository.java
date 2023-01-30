@@ -8,4 +8,5 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface CatalogueRepository extends ReactiveCrudRepository<CatalogueItem, Long> {
     Mono<CatalogueItem> findBySku(String sku);
+    Mono<CatalogueItem> deleteBySku(String sku);
 }
