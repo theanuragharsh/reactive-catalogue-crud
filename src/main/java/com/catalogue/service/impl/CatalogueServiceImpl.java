@@ -67,23 +67,26 @@ public class CatalogueServiceImpl implements CatalogueService {
         });
     }
 
-    @Override
-/*    public Mono<CatalogueItemResponse> updateCatalogueItem(String sku, CatalogueItem catalogueItem) {
-        return catalogueRepository.findBySku(sku).flatMap(existingItem -> {
-            log.info("Catalogue Item {} found", sku);
-            existingItem.setPrice(catalogueItem.getPrice());
-            existingItem.setUpdatedOn(Instant.now());
-            return catalogueRepository.save(existingItem).map(buildCatalogueItemResponseFromItemFunction());
-        });
-    }*/
+    /*    public Mono<CatalogueItemResponse> updateCatalogueItem(String sku, CatalogueItem catalogueItem) {
+            return catalogueRepository.findBySku(sku).flatMap(existingItem -> {
+                log.info("Catalogue Item {} found", sku);
+                existingItem.setPrice(catalogueItem.getPrice());
+                existingItem.setUpdatedOn(Instant.now());
+                return catalogueRepository.save(existingItem).map(buildCatalogueItemResponseFromItemFunction());
+            });
+        }*/
 /*    In this optimized version, we have used the doOnNext operator instead of flatMap to update the existingItem.
     This way we can avoid unnecessary flatMap operations.
     Additionally, the use of a method reference to the
     catalogueRepository.save method helps make the code more concise and readable.
   */
-
+    @Override
     public Mono<CatalogueItemResponse> updateCatalogueItem(String sku, CatalogueItem catalogueItem) {
         return catalogueRepository.findBySku(sku)
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.warn("Catalogue Item {} was not found...processing", sku);
+                    return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found"));
+                }))
                 .doOnNext(existingItem -> {
                     log.info("Catalogue Item {} found and updated", sku);
                     existingItem.setPrice(catalogueItem.getPrice());
