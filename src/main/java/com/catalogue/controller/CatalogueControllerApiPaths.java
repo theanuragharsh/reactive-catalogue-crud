@@ -1,12 +1,8 @@
 package com.catalogue.controller;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.Value;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CatalogueControllerApiPaths {
 
     public static final String BASE_PATH = "/api/v1";

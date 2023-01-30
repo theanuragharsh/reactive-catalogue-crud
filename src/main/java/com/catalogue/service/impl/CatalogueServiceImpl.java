@@ -37,11 +37,10 @@ public class CatalogueServiceImpl implements CatalogueService {
     }
 
     @Override
-    public Mono<ResponseEntity<CatalogueItemResponse>> createCatalogueItem(CatalogueItem catalogueItem) {
+    public Mono<CatalogueItemResponse> createCatalogueItem(CatalogueItem catalogueItem) {
         return catalogueRepository.save(catalogueItem).map(item -> {
             log.info("Catalogue Item : {} Created", catalogueItem.getId());
-            return new ResponseEntity<>(catalogueMapper
-                    .toCatalogueResponse(catalogueItem), HttpStatus.CREATED);
+            return catalogueMapper.toCatalogueResponse(catalogueItem);
         });
     }
 

@@ -40,7 +40,7 @@ public class CatalogueController {
 
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping(path = CatalogueControllerApiPaths.CREATE)
-    public Mono<ResponseEntity<CatalogueItemResponse>> createCatalogueItem(@RequestBody CatalogueItem catalogueItem) {
+    public Mono<CatalogueItemResponse> createCatalogueItem(@RequestBody CatalogueItem catalogueItem) {
         return catalogueService.createCatalogueItem(catalogueItem);
     }
 
