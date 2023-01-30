@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.function.Function;
 
@@ -64,6 +65,32 @@ public class CatalogueServiceImpl implements CatalogueService {
             log.info("Catalogue Item {} found", sku);
             return catalogueMapper.toCatalogueResponse(catalogueItem);
         });
+    }
+
+    @Override
+/*    public Mono<CatalogueItemResponse> updateCatalogueItem(String sku, CatalogueItem catalogueItem) {
+        return catalogueRepository.findBySku(sku).flatMap(existingItem -> {
+            log.info("Catalogue Item {} found", sku);
+            existingItem.setPrice(catalogueItem.getPrice());
+            existingItem.setUpdatedOn(Instant.now());
+            return catalogueRepository.save(existingItem).map(buildCatalogueItemResponseFromItemFunction());
+        });
+    }*/
+/*    In this optimized version, we have used the doOnNext operator instead of flatMap to update the existingItem.
+    This way we can avoid unnecessary flatMap operations.
+    Additionally, the use of a method reference to the
+    catalogueRepository.save method helps make the code more concise and readable.
+  */
+
+    public Mono<CatalogueItemResponse> updateCatalogueItem(String sku, CatalogueItem catalogueItem) {
+        return catalogueRepository.findBySku(sku)
+                .doOnNext(existingItem -> {
+                    log.info("Catalogue Item {} found and updated", sku);
+                    existingItem.setPrice(catalogueItem.getPrice());
+                    existingItem.setUpdatedOn(Instant.now());
+                })
+                .flatMap(catalogueRepository::save)
+                .map(buildCatalogueItemResponseFromItemFunction());
     }
 
     /**

@@ -3,6 +3,7 @@ package com.catalogue.controller;
 import com.catalogue.dto.CatalogueItemResponse;
 import com.catalogue.models.CatalogueItem;
 import com.catalogue.service.CatalogueService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,27 +22,14 @@ public class CatalogueController {
     private final CatalogueService catalogueService;
 
     /**
-     * Get Catalogue Items available in database
+     * Find All Catalogue Items available in database
      *
      * @return catalogueItems
      */
-    @GetMapping(path = CatalogueControllerApiPaths.GET_ITEMS_STREAM, produces = MediaType.APPLICATION_NDJSON_VALUE)
+    @GetMapping(path = CatalogueControllerApiPaths.GET_ITEMS_STREAM, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseStatus(value = HttpStatus.OK)
-    public Flux<CatalogueItemResponse> getCatalogueItems() {
+    public Flux<CatalogueItemResponse> findAllCatalogueItems() {
         return catalogueService.getCatalogueItems();
-    }
-
-    /**
-     * Create Catalogue Item
-     *
-     * @param catalogueItem
-     * @return created CatalogueItem
-     */
-
-    @ResponseStatus(value = HttpStatus.CREATED)
-    @PostMapping(path = CatalogueControllerApiPaths.CREATE)
-    public Mono<CatalogueItemResponse> createCatalogueItem(@RequestBody CatalogueItem catalogueItem) {
-        return catalogueService.createCatalogueItem(catalogueItem);
     }
 
     /**
@@ -66,5 +54,31 @@ public class CatalogueController {
     @GetMapping(path = CatalogueControllerApiPaths.GET_ITEM_BY_SKU)
     public Mono<CatalogueItemResponse> findBySku(@PathVariable String sku) {
         return catalogueService.findBySku(sku);
+    }
+
+    /**
+     * Create Catalogue Item
+     *
+     * @param catalogueItem
+     * @return created CatalogueItem
+     */
+
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @PostMapping(path = CatalogueControllerApiPaths.CREATE)
+    public Mono<CatalogueItemResponse> createCatalogueItem(@RequestBody CatalogueItem catalogueItem) {
+        return catalogueService.createCatalogueItem(catalogueItem);
+    }
+
+    /**
+     * Update Catalogue Item by SKU
+     *
+     * @param sku
+     * @param catalogueItem
+     * @return created CatalogueItemResponse
+     */
+    @ResponseStatus(value = HttpStatus.OK)
+    @PutMapping(path = CatalogueControllerApiPaths.UPDATE)
+    public Mono<CatalogueItemResponse> updateCatalogueItem(@PathVariable String sku, @RequestBody CatalogueItem catalogueItem) {
+        return catalogueService.updateCatalogueItem(sku, catalogueItem);
     }
 }
