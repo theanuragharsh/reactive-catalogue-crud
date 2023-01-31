@@ -47,13 +47,10 @@ public class CatalogueServiceImpl implements CatalogueService {
 
     @Override
     public Mono<CatalogueItemResponse> findById(Long id) {
-        return catalogueRepository.findById(id).switchIfEmpty(Mono.defer(() -> {
-            log.warn("Catalogue Item {} was not found", id);
-            return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found"));
-        })).map(catalogueItem -> {
-            log.info("Catalogue Item {} found", id);
-            return catalogueMapper.toCatalogueResponse(catalogueItem);
-        });
+        return catalogueRepository.findById(id)
+                .map(catalogueMapper::toCatalogueResponse)
+                .switchIfEmpty(Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found")))
+                .doOnSuccess(item -> log.info("Catalogue Item {} found", id));
     }
 
     @Override
