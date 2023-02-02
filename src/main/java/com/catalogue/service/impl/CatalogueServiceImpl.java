@@ -9,13 +9,11 @@ import com.catalogue.service.CatalogueService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.function.Function;
 
 @Slf4j
@@ -29,6 +27,7 @@ public class CatalogueServiceImpl implements CatalogueService {
 
     @Override
     public Flux<CatalogueItemResponse> getCatalogueItems() {
+        log.debug("Finding CatalogueItems");
         return catalogueRepository.findAll()
                 .switchIfEmpty(Mono.defer(() -> {
                             log.warn("Database Empty");
@@ -48,14 +47,17 @@ public class CatalogueServiceImpl implements CatalogueService {
 
     @Override
     public Mono<CatalogueItemResponse> findById(Long id) {
+        log.debug("Finding CatalogueItem with id: {}", id);
         return catalogueRepository.findById(id)
                 .map(catalogueMapper::toCatalogueResponse)
-                .switchIfEmpty(Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found")))
+                .switchIfEmpty(Mono.error(
+                        new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found")))
                 .doOnSuccess(item -> log.info("Catalogue Item {} found", id));
     }
 
     @Override
     public Mono<CatalogueItemResponse> findBySku(String sku) {
+        log.debug("Finding CatalogueItem with sku: {}", sku);
         return catalogueRepository.findBySku(sku).switchIfEmpty(Mono.defer(() -> {
             log.warn("SKU {} was not found", sku);
             return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "SKU not found"));
