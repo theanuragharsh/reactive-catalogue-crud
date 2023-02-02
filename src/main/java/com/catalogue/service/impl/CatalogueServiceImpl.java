@@ -22,6 +22,7 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 public class CatalogueServiceImpl implements CatalogueService {
+// TODO: Implement error handling for the save operation
 
     private final CatalogueRepository catalogueRepository;
     private final CatalogueMapper catalogueMapper;
@@ -110,7 +111,7 @@ public class CatalogueServiceImpl implements CatalogueService {
     /**
      * @return Function to map CatalogueItem into CatalogueItemResponse object using builder pattern
      */
-    private Function<CatalogueItem, CatalogueItemResponse> buildCatalogueItemResponseFromItemFunction() {
+    private final Function<CatalogueItem, CatalogueItemResponse> buildCatalogueItemResponseFromItemFunction() {
         return catalogueItem ->
                 CatalogueItemResponse.builder()
                         .id(catalogueItem.getId())

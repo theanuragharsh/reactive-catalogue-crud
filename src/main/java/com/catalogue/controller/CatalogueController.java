@@ -18,6 +18,8 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @RequestMapping(CatalogueControllerApiPaths.BASE_PATH)
 public class CatalogueController {
+    // TODO: Implement error handling for the save operation
+
 
     private final CatalogueService catalogueService;
 
@@ -36,7 +38,7 @@ public class CatalogueController {
      * Find By id
      *
      * @param id
-     * @return CatalogueItem
+     * @return CatalogueItemResponse
      */
     @ResponseStatus(value = HttpStatus.OK)
     @GetMapping(path = CatalogueControllerApiPaths.GET_ITEM_BY_ID, produces = MediaType.APPLICATION_NDJSON_VALUE)
