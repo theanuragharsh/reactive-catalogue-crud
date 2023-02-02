@@ -57,8 +57,8 @@ public class CatalogueServiceImpl implements CatalogueService {
     @Override
     public Mono<CatalogueItemResponse> findBySku(String sku) {
         return catalogueRepository.findBySku(sku).switchIfEmpty(Mono.defer(() -> {
-            log.warn("Catalogue Item {} was not found", sku);
-            return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found"));
+            log.warn("SKU {} was not found", sku);
+            return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "SKU not found"));
         })).map(catalogueItem -> {
             log.info("Catalogue Item {} found", sku);
             return catalogueMapper.toCatalogueResponse(catalogueItem);

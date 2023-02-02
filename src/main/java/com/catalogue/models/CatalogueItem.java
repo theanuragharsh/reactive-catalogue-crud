@@ -18,7 +18,7 @@ import java.time.Instant;
 @Data
 @Builder
 @AllArgsConstructor
-@RequiredArgsConstructor(staticName = "of")
+@RequiredArgsConstructor()
 @Table("CATALOGUE_ITEMS")
 public class CatalogueItem {
 
