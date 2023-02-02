@@ -40,6 +40,7 @@ public class CatalogueServiceImpl implements CatalogueService {
     @Override
     public Mono<CatalogueItemResponse> createCatalogueItem(CatalogueItem catalogueItem) {
         return catalogueRepository.save(catalogueItem).map(item -> {
+            catalogueItem.setCreatedOn(Instant.now());
             log.info("Catalogue Item : {} Created", catalogueItem.getId());
             return catalogueMapper.toCatalogueResponse(catalogueItem);
         });
