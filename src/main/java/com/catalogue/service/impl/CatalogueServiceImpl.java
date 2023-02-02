@@ -50,8 +50,10 @@ public class CatalogueServiceImpl implements CatalogueService {
         log.debug("Finding CatalogueItem with id: {}", id);
         return catalogueRepository.findById(id)
                 .map(catalogueMapper::toCatalogueResponse)
-                .switchIfEmpty(Mono.error(
-                        new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found")))
+                .switchIfEmpty(Mono.error(() -> {
+                    log.warn("ID {} was not found", id);
+                    return new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found");
+                }))
                 .doOnSuccess(item -> log.info("Catalogue Item {} found", id));
     }
 

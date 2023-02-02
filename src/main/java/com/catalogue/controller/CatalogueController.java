@@ -3,12 +3,10 @@ package com.catalogue.controller;
 import com.catalogue.dto.CatalogueItemResponse;
 import com.catalogue.models.CatalogueItem;
 import com.catalogue.service.CatalogueService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,8 +16,6 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @RequestMapping(CatalogueControllerApiPaths.BASE_PATH)
 public class CatalogueController {
-    // TODO: Implement error handling for the save operation
-
 
     private final CatalogueService catalogueService;
 

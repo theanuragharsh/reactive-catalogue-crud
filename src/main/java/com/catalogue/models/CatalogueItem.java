@@ -11,7 +11,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-// TODO: Implement error handling for the save operation
 
 import java.time.Instant;
 

@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -21,11 +23,14 @@ public class GlobalExceptionHandler extends RuntimeException {
     private static final String ERRORS = "errors";
 
     @ExceptionHandler(value = ItemNotFoundException.class)
-    public ResponseEntity<HashMap<String, ApiErrorResponse>> itemNotFoundException(ItemNotFoundException itemNotFoundException) {
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public ResponseEntity itemNotFoundException(ItemNotFoundException itemNotFoundException) {
+        log.error("No resource found exception occurred: {} ", itemNotFoundException.getMessage());
         HashMap<String, List<ApiErrorResponse>> errors = new HashMap<>();
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder().category(API_ERROR).status(HttpStatus.NO_CONTENT)
                 .message(itemNotFoundException.getReason()).timestamp(LocalDateTime.now()).build();
         errors.put(ERRORS, List.of(apiErrorResponse));
         return new ResponseEntity(errors, itemNotFoundException.getStatusCode());
     }
+
 }
