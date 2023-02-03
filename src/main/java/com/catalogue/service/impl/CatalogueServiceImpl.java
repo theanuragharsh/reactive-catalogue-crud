@@ -28,7 +28,7 @@ public class CatalogueServiceImpl implements CatalogueService {
     @Override
     public Flux<CatalogueItemResponse> getCatalogueItems() {
         log.debug("Finding CatalogueItems");
-        return catalogueRepository.findAll()
+        return this.catalogueRepository.findAll()
                 .switchIfEmpty(Mono.defer(() -> {
                             log.warn("Database Empty");
                             return Mono.error(new ItemNotFoundException(HttpStatus.NO_CONTENT, "Database Empty"));
@@ -39,7 +39,7 @@ public class CatalogueServiceImpl implements CatalogueService {
 
     @Override
     public Mono<CatalogueItemResponse> createCatalogueItem(CatalogueItem catalogueItem) {
-        return catalogueRepository.save(catalogueItem).map(item -> {
+        return this.catalogueRepository.save(catalogueItem).map(item -> {
             catalogueItem.setCreatedOn(Instant.now());
             log.info("Catalogue Item : {} Created", catalogueItem.getId());
             return catalogueMapper.toCatalogueResponse(catalogueItem);
@@ -49,7 +49,7 @@ public class CatalogueServiceImpl implements CatalogueService {
     @Override
     public Mono<CatalogueItemResponse> findById(Long id) {
         log.debug("Finding CatalogueItem with id: {}", id);
-        return catalogueRepository.findById(id)
+        return this.catalogueRepository.findById(id)
                 .map(catalogueMapper::toCatalogueResponse)
                 .switchIfEmpty(Mono.error(() -> {
                     log.warn("ID {} was not found", id);
@@ -61,7 +61,7 @@ public class CatalogueServiceImpl implements CatalogueService {
     @Override
     public Mono<CatalogueItemResponse> findBySku(String sku) {
         log.debug("Finding CatalogueItem with sku: {}", sku);
-        return catalogueRepository.findBySku(sku).switchIfEmpty(Mono.defer(() -> {
+        return this.catalogueRepository.findBySku(sku).switchIfEmpty(Mono.defer(() -> {
             log.warn("SKU {} was not found", sku);
             return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "SKU not found"));
         })).map(catalogueItem -> {
@@ -85,7 +85,7 @@ public class CatalogueServiceImpl implements CatalogueService {
   */
     @Override
     public Mono<CatalogueItemResponse> updateCatalogueItem(String sku, CatalogueItem catalogueItem) {
-        return catalogueRepository.findBySku(sku)
+        return this.catalogueRepository.findBySku(sku)
                 .switchIfEmpty(Mono.defer(() -> {
                     log.warn("Catalogue Item {} was not found", sku);
                     return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found"));
@@ -108,7 +108,7 @@ public class CatalogueServiceImpl implements CatalogueService {
      */
     @Override
     public Mono<Void> removeCatalogueItem(String sku) {
-        return catalogueRepository.deleteBySku(sku)
+        return this.catalogueRepository.deleteBySku(sku)
                 .doOnError(ItemNotFoundException.class, ex -> log.warn("Catalogue Item {} was not found", sku))
                 .then();
     }
