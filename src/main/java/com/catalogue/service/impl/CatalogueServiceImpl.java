@@ -84,19 +84,36 @@ public class CatalogueServiceImpl implements CatalogueService {
     catalogueRepository.save method helps make the code more concise and readable.
   */
     @Override
+//    public Mono<CatalogueItemResponse> updateCatalogueItem(String sku, CatalogueItem catalogueItem) {
+//        return this.catalogueRepository.findBySku(sku)
+//                .switchIfEmpty(Mono.defer(() -> {
+//                    log.warn("Catalogue Item {} was not found", sku);
+//                    return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found"));
+//                }))
+//                .doOnNext(existingItem -> {
+//                    log.info("Catalogue Item {} found and updated", sku);
+//                    existingItem.setPrice(catalogueItem.getPrice());
+//                    existingItem.setUpdatedOn(Instant.now());
+//                })
+//                .flatMap(catalogueRepository::save)
+//                .map(buildCatalogueItemResponseFromItemFunction());
+//    }
     public Mono<CatalogueItemResponse> updateCatalogueItem(String sku, CatalogueItem catalogueItem) {
         return this.catalogueRepository.findBySku(sku)
-                .switchIfEmpty(Mono.defer(() -> {
-                    log.warn("Catalogue Item {} was not found", sku);
-                    return Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found"));
-                }))
-                .doOnNext(existingItem -> {
-                    log.info("Catalogue Item {} found and updated", sku);
+                .switchIfEmpty(Mono.error(new ItemNotFoundException(HttpStatus.NOT_FOUND, "Content not found")))
+                .flatMap(existingItem -> {
+                    log.info(" Item {} found : updating", sku);
                     existingItem.setPrice(catalogueItem.getPrice());
                     existingItem.setUpdatedOn(Instant.now());
+                    return catalogueRepository.save(existingItem);
                 })
-                .flatMap(catalogueRepository::save)
-                .map(buildCatalogueItemResponseFromItemFunction());
+                .map(buildCatalogueItemResponseFromItemFunction())
+                .onErrorResume(e -> {
+                    if (e instanceof ItemNotFoundException) {
+                        log.info(" Item {} not found", sku);
+                    }
+                    return Mono.error(e);
+                });
     }
 
     /**
