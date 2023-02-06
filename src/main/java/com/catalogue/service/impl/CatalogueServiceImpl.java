@@ -1,6 +1,7 @@
 package com.catalogue.service.impl;
 
 import com.catalogue.dto.CatalogueItemResponse;
+import com.catalogue.exceptions.BadRequestException;
 import com.catalogue.exceptions.DatabaseEmptyException;
 import com.catalogue.exceptions.ItemNotFoundException;
 import com.catalogue.mapper.CatalogueMapper;
@@ -30,12 +31,12 @@ public class CatalogueServiceImpl implements CatalogueService {
     public Flux<CatalogueItemResponse> getCatalogueItems() {
         log.debug("Finding CatalogueItems");
         return this.catalogueRepository.findAll()
+                .map(buildCatalogueItemResponseFromItemFunction())
                 .switchIfEmpty(Mono.error(() -> {
                             log.warn("Database empty!");
                             return new ItemNotFoundException(HttpStatus.NOT_FOUND, "Database empty!");
                         })
-                )
-                .map(buildCatalogueItemResponseFromItemFunction());
+                );
     }
 
     @Override
@@ -49,6 +50,9 @@ public class CatalogueServiceImpl implements CatalogueService {
 
     @Override
     public Mono<CatalogueItemResponse> findById(Long id) {
+        if (id == null) {
+            return Mono.error(new BadRequestException(HttpStatus.BAD_REQUEST, "ID must be a numberical value and not null"));
+        }
         log.debug("Finding CatalogueItem with id: {}", id);
         return this.catalogueRepository.findById(id)
                 .map(catalogueMapper::toCatalogueResponse)

@@ -1,6 +1,7 @@
 package com.catalogue.controller.advice;
 
 import com.catalogue.dto.ApiErrorResponse;
+import com.catalogue.exceptions.BadRequestException;
 import com.catalogue.exceptions.DatabaseEmptyException;
 import com.catalogue.exceptions.ItemNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -45,4 +46,14 @@ public class GlobalExceptionHandler extends RuntimeException {
         return new ResponseEntity(errors, databaseEmptyException.getStatusCode());
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ResponseEntity badRequestException(BadRequestException badRequestException) {
+        log.error("BadRequestException occurred : wrong user input", badRequestException.getMessage());
+        HashMap<String, List<ApiErrorResponse>> errors = new HashMap<>();
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder().category(API_ERROR).status(HttpStatus.BAD_REQUEST)
+                .message(badRequestException.getReason()).timestamp(LocalDateTime.now()).build();
+        errors.put(ERRORS, List.of(apiErrorResponse));
+        return new ResponseEntity(errors, badRequestException.getStatusCode());
+    }
 }
