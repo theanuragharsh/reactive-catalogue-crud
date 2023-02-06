@@ -1,6 +1,7 @@
 package com.catalogue.service.impl;
 
 import com.catalogue.dto.CatalogueItemResponse;
+import com.catalogue.exceptions.DatabaseEmptyException;
 import com.catalogue.exceptions.ItemNotFoundException;
 import com.catalogue.mapper.CatalogueMapper;
 import com.catalogue.models.CatalogueItem;
@@ -31,7 +32,7 @@ public class CatalogueServiceImpl implements CatalogueService {
         return this.catalogueRepository.findAll()
                 .switchIfEmpty(Mono.defer(() -> {
                             log.warn("Database Empty");
-                            return Mono.error(new ItemNotFoundException(HttpStatus.NO_CONTENT, "Database Empty"));
+                            return Mono.error(new DatabaseEmptyException(HttpStatus.NO_CONTENT, "Database Empty"));
                         })
                 )
                 .map(buildCatalogueItemResponseFromItemFunction());

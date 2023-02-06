@@ -1,6 +1,7 @@
 package com.catalogue.controller.advice;
 
 import com.catalogue.dto.ApiErrorResponse;
+import com.catalogue.exceptions.DatabaseEmptyException;
 import com.catalogue.exceptions.ItemNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,14 +24,25 @@ public class GlobalExceptionHandler extends RuntimeException {
     private static final String ERRORS = "errors";
 
     @ExceptionHandler(value = ItemNotFoundException.class)
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
     public ResponseEntity itemNotFoundException(ItemNotFoundException itemNotFoundException) {
         log.error("No resource found exception occurred: {} ", itemNotFoundException.getMessage());
         HashMap<String, List<ApiErrorResponse>> errors = new HashMap<>();
-        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder().category(API_ERROR).status(HttpStatus.NO_CONTENT)
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder().category(API_ERROR).status(HttpStatus.NOT_FOUND)
                 .message(itemNotFoundException.getReason()).timestamp(LocalDateTime.now()).build();
         errors.put(ERRORS, List.of(apiErrorResponse));
         return new ResponseEntity(errors, itemNotFoundException.getStatusCode());
+    }
+
+    @ExceptionHandler(value = DatabaseEmptyException.class)
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public ResponseEntity databaseEmptyException(DatabaseEmptyException databaseEmptyException) {
+        log.error("No resource found exception occurred: {} ", databaseEmptyException.getMessage());
+        HashMap<String, List<ApiErrorResponse>> errors = new HashMap<>();
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder().category(API_ERROR).status(HttpStatus.NO_CONTENT)
+                .message(databaseEmptyException.getReason()).timestamp(LocalDateTime.now()).build();
+        errors.put(ERRORS, List.of(apiErrorResponse));
+        return new ResponseEntity(errors, databaseEmptyException.getStatusCode());
     }
 
 }

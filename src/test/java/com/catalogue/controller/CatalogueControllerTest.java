@@ -1,6 +1,7 @@
 package com.catalogue.controller;
 
 import com.catalogue.dto.CatalogueItemResponse;
+import com.catalogue.exceptions.DatabaseEmptyException;
 import com.catalogue.exceptions.ItemNotFoundException;
 import com.catalogue.service.CatalogueService;
 import org.junit.Test;
@@ -47,7 +48,7 @@ public class CatalogueControllerTest {
 
     @Test
     public void getCatalogueItemsWhenNoItemPresent() {
-        when(catalogueService.getCatalogueItems()).thenThrow(new ItemNotFoundException(HttpStatus.NO_CONTENT, "Database Empty"));
+        when(catalogueService.getCatalogueItems()).thenThrow(new DatabaseEmptyException(HttpStatus.NO_CONTENT, "Database Empty"));
 
         webTestClient.get().uri("/api/v1/stream").exchange()
                 .expectStatus().isNoContent()
