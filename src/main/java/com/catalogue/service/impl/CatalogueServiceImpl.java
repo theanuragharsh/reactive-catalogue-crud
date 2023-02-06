@@ -30,9 +30,9 @@ public class CatalogueServiceImpl implements CatalogueService {
     public Flux<CatalogueItemResponse> getCatalogueItems() {
         log.debug("Finding CatalogueItems");
         return this.catalogueRepository.findAll()
-                .switchIfEmpty(Mono.defer(() -> {
-                            log.warn("Database Empty");
-                            return Mono.error(new DatabaseEmptyException(HttpStatus.NO_CONTENT, "Database Empty"));
+                .switchIfEmpty(Mono.error(() -> {
+                            log.warn("Database empty!");
+                            return new ItemNotFoundException(HttpStatus.NOT_FOUND, "Database empty!");
                         })
                 )
                 .map(buildCatalogueItemResponseFromItemFunction());

@@ -1,8 +1,8 @@
 package com.catalogue.controller;
 
+import com.catalogue.dto.ApiErrorResponse;
 import com.catalogue.dto.CatalogueItemResponse;
 import com.catalogue.exceptions.DatabaseEmptyException;
-import com.catalogue.exceptions.ItemNotFoundException;
 import com.catalogue.service.CatalogueService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,9 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 import static org.mockito.Mockito.when;
@@ -43,17 +46,22 @@ public class CatalogueControllerTest {
         StepVerifier.create(responseBody)
                 .expectNext(new CatalogueItemResponse(1000L, "TLG-SKU-0010", "ITEM 0010", "ITEM DESC 0010", "Books", 1000.0, now, now))
                 .expectNext(new CatalogueItemResponse(1111L, "TLG-SKU-0011", "ITEM 0010", "ITEM DESC 0010", "Books", 1000.0, now, now))
-                .verifyComplete();
+                .expectComplete()
+                .verify();
     }
 
     @Test
     public void getCatalogueItemsWhenNoItemPresent() {
         when(catalogueService.getCatalogueItems()).thenThrow(new DatabaseEmptyException(HttpStatus.NO_CONTENT, "Database Empty"));
 
-        webTestClient.get().uri("/api/v1/stream").exchange()
-                .expectStatus().isNoContent()
-                .expectBody(String.class)
-                .isEqualTo("Database Empty");
-//        StepVerifier.create(responseBody).expectError(ItemNotFoundException.class).verify();
+        Mono<ApiErrorResponse> apiErrorResponseMono = Mono
+                .just(new ApiErrorResponse(LocalDateTime.now(), "API_ERROR", HttpStatus.NO_CONTENT, "Database Empty"));
+        Flux<ApiErrorResponse> responseBody = webTestClient.get().uri("/api/v1/stream").exchange()
+                .expectStatus().isNoContent().returnResult(ApiErrorResponse.class).getResponseBody();
+        StepVerifier
+                .create(responseBody)
+                .expectNext(new ApiErrorResponse(LocalDateTime.now(), "API_ERROR", HttpStatus.NO_CONTENT, "Database Empty"))
+                .expectComplete()
+                .verify();
     }
 }
