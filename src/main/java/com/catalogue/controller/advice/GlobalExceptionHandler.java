@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -43,13 +42,13 @@ public class GlobalExceptionHandler extends RuntimeException {
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder().category(API_ERROR).status(HttpStatus.NO_CONTENT)
                 .message(databaseEmptyException.getReason()).timestamp(LocalDateTime.now()).build();
         errors.put(ERRORS, List.of(apiErrorResponse));
-        return new ResponseEntity(errors, databaseEmptyException.getStatusCode());
+        return new ResponseEntity(errors, HttpStatus.NO_CONTENT);
     }
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ResponseEntity badRequestException(BadRequestException badRequestException) {
-        log.error("BadRequestException occurred : wrong user input", badRequestException.getMessage());
+        log.error("BadRequestException occurred : {} ", badRequestException.getMessage());
         HashMap<String, List<ApiErrorResponse>> errors = new HashMap<>();
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder().category(API_ERROR).status(HttpStatus.BAD_REQUEST)
                 .message(badRequestException.getReason()).timestamp(LocalDateTime.now()).build();
