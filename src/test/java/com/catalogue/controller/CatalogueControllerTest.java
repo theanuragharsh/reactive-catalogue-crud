@@ -17,7 +17,6 @@ import reactor.test.StepVerifier;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(CatalogueController.class)
