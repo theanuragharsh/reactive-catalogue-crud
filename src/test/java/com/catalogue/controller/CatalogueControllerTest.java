@@ -17,6 +17,8 @@ import reactor.test.StepVerifier;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(CatalogueController.class)
@@ -94,6 +96,22 @@ public class CatalogueControllerTest {
                 .expectNext(catalogueItemResponse)
                 .expectComplete()
                 .verify();
+    }
+
+    @Test
+    public void testRemoveCatalogueItem() {
+
+        given(catalogueService.removeCatalogueItem(any()))
+                .willReturn(Mono.empty());
+        StepVerifier.create(webTestClient.
+                        delete()
+                        .uri("/api/v1/TLG-SKU-0010")
+                        .exchange()
+                        .expectStatus()
+                        .isNoContent()
+                        .returnResult(Void.class)
+                        .getResponseBody())
+                .expectComplete().verify();
     }
 
 }
