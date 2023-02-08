@@ -31,7 +31,7 @@ public class CatalogueControllerTest {
     private final Instant now = Instant.now().truncatedTo(ChronoUnit.MINUTES);
 
     @Test
-    public void getCatalogueItemsTest() {
+    public void testGetCatalogueItems() {
         Flux<CatalogueItemResponse> catalogueItemResponseFlux = Flux
                 .just(new CatalogueItemResponse(1000L, "TLG-SKU-0010", "ITEM 0010", "ITEM DESC 0010", "Books", 1000.0, now, now),
                         new CatalogueItemResponse(1111L, "TLG-SKU-0011", "ITEM 0010", "ITEM DESC 0010", "Books", 1000.0, now, now));
@@ -47,7 +47,7 @@ public class CatalogueControllerTest {
     }
 
     @Test
-    public void findByIdTest() {
+    public void testFindById() {
 
         Mono<CatalogueItemResponse> catalogueItemResponse = Mono.just(CatalogueItemResponse.builder()
                 .id(1000L).sku("TLG-SKU-0010").name("ITEM 0010").description("ITEM DESC 0010").category("Books").price(1000.0).createdOn(now).updatedOn(now)
@@ -62,7 +62,7 @@ public class CatalogueControllerTest {
     }
 
     @Test
-    public void findBySku() {
+    public void testFindBySku() {
 
         Mono<CatalogueItemResponse> catalogueItemResponse = Mono.just(CatalogueItemResponse.builder()
                 .id(1000L).sku("TLG-SKU-0010").name("ITEM 0010").description("ITEM DESC 0010").category("Books").price(1000.0).createdOn(now).updatedOn(now)
@@ -77,54 +77,23 @@ public class CatalogueControllerTest {
     }
 
     @Test
-    public void createCatalogueItemTest() {
-        CatalogueItem catalogueItemRequest = CatalogueItem.builder()
-                .sku("TLG-SKU-0001").name("ITEM 0001").description("ITEM DESC 0001").category("Books").price(1000.0).inventory(1)
-                .createdOn(now).updatedOn(now)
-                .build();
-        Mono<CatalogueItemResponse> catalogueItemResponse = Mono.just(CatalogueItemResponse.builder()
-                .id(1L).sku("TLG-SKU-0001").name("ITEM 0001").description("ITEM DESC 0001").category("Books").price(1000.0).createdOn(now).updatedOn(null)
-                .build());
-        when(catalogueService.createCatalogueItem(catalogueItemRequest)).thenReturn(catalogueItemResponse);
-        Flux<CatalogueItemResponse> responseBody = webTestClient.post().uri("/api/v1/").exchange().expectStatus().isCreated().returnResult(CatalogueItemResponse.class).getResponseBody();
-        StepVerifier.create(responseBody)
-                .expectNext(new CatalogueItemResponse(1L, "TLG-SKU-0001", "ITEM 0001", "ITEM DESC 0001", "Books", 1000.0, now, null))
-                .expectComplete().verify();
-    }
-
-    @Test
     public void testCreateCatalogueItem() {
         // Given
-        CatalogueItem catalogueItem = new CatalogueItem(1L, "1", "Item 1","Description of Item 1","Books",1000.0,1,now,now);
-        CatalogueItemResponse expectedResponse = new CatalogueItemResponse(1L, "1", "Item 1","Description of Item 1","Books",1000.0,now,now);
-        Mono<CatalogueItemResponse> expectedResult = Mono.just(expectedResponse);
-        when(catalogueService.createCatalogueItem(catalogueItem)).thenReturn(expectedResult);
+        CatalogueItem catalogueItem = new CatalogueItem(1L, "TLG-SKU-0001", "ITEM 0001", "ITEM DESC 0001", "Books", 1000.0, 1, now, null);
+        CatalogueItemResponse catalogueItemResponse = new CatalogueItemResponse(1L, "TLG-SKU-0001", "ITEM 0001", "ITEM DESC 0001", "Books", 1000.0, now, null);
+        when(catalogueService.createCatalogueItem(catalogueItem)).thenReturn(Mono.just(catalogueItemResponse));
 
         // When
-        StepVerifier.create(webTestClient.post().uri("/api/v1/").
-                        exchange().expectStatus().isCreated().returnResult(CatalogueItemResponse.class).getResponseBody())
-                .expectNext(expectedResponse)
+        StepVerifier.create(webTestClient.post().uri("/api/v1/")
+                        .bodyValue(catalogueItem)
+                        .exchange()
+                        .expectStatus()
+                        .isCreated()
+                        .returnResult(CatalogueItemResponse.class)
+                        .getResponseBody())
+                .expectNext(catalogueItemResponse)
                 .expectComplete()
                 .verify();
-
     }
 
-/*    @Test
-    public void getCatalogueItemsWhenNoItemPresent() {
-
-        Mono<ApiErrorResponse> apiErrorResponseMono = Mono.just(ApiErrorResponse.builder()
-                .timestamp(LocalDateTime.now()).category("API_ERROR").status(HttpStatus.NO_CONTENT).message("Database Empty")
-                .build());
-
-        when(catalogueService.getCatalogueItems());
-//                .thenReturn(new ApiErrorResponse(LocalDateTime.now(),"API_ERROR",HttpStatus.NO_CONTENT,"Database Empty"));
-
-        Flux<ApiErrorResponse> responseBody = webTestClient.get().uri("/api/v1/stream").exchange().expectStatus().isNoContent().returnResult(ApiErrorResponse.class).getResponseBody();
-//                .expectStatus().isNoContent().returnResult(ApiErrorResponse.class).getResponseBody();
-        StepVerifier
-                .create(responseBody)
-                .expectNext(new ApiErrorResponse(LocalDateTime.now(), "API_ERROR", HttpStatus.NO_CONTENT, "Database Empty"))
-                .expectComplete()
-                .verify();
-    }*/
 }

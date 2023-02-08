@@ -25,34 +25,34 @@ public class GlobalExceptionHandler extends RuntimeException {
 
     @ExceptionHandler(value = ItemNotFoundException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public ResponseEntity itemNotFoundException(ItemNotFoundException itemNotFoundException) {
+    public ResponseEntity<HashMap<String,List<ApiErrorResponse>>> itemNotFoundException(ItemNotFoundException itemNotFoundException) {
         log.error("No resource found exception occurred: {} ", itemNotFoundException.getMessage());
         HashMap<String, List<ApiErrorResponse>> errors = new HashMap<>();
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder().category(API_ERROR).status(HttpStatus.NOT_FOUND)
                 .message(itemNotFoundException.getReason()).timestamp(LocalDateTime.now()).build();
         errors.put(ERRORS, List.of(apiErrorResponse));
-        return new ResponseEntity(errors, itemNotFoundException.getStatusCode());
+        return new ResponseEntity<>(errors, itemNotFoundException.getStatusCode());
     }
 
     @ExceptionHandler(value = DatabaseEmptyException.class)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public ResponseEntity databaseEmptyException(DatabaseEmptyException databaseEmptyException) {
+    public ResponseEntity<HashMap<String,List<ApiErrorResponse>>> databaseEmptyException(DatabaseEmptyException databaseEmptyException) {
         log.error("No resource found exception occurred: {} ", databaseEmptyException.getMessage());
         HashMap<String, List<ApiErrorResponse>> errors = new HashMap<>();
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder().category(API_ERROR).status(HttpStatus.NO_CONTENT)
                 .message(databaseEmptyException.getReason()).timestamp(LocalDateTime.now()).build();
         errors.put(ERRORS, List.of(apiErrorResponse));
-        return new ResponseEntity(errors, HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(errors, HttpStatus.NO_CONTENT);
     }
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ResponseEntity badRequestException(BadRequestException badRequestException) {
+    public ResponseEntity<HashMap<String,List<ApiErrorResponse>>> badRequestException(BadRequestException badRequestException) {
         log.error("BadRequestException occurred : {} ", badRequestException.getMessage());
         HashMap<String, List<ApiErrorResponse>> errors = new HashMap<>();
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder().category(API_ERROR).status(HttpStatus.BAD_REQUEST)
                 .message(badRequestException.getReason()).timestamp(LocalDateTime.now()).build();
         errors.put(ERRORS, List.of(apiErrorResponse));
-        return new ResponseEntity(errors, badRequestException.getStatusCode());
+        return new ResponseEntity<>(errors, badRequestException.getStatusCode());
     }
 }

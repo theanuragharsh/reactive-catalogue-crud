@@ -5,6 +5,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 public class ItemNotFoundException extends ResponseStatusException {
     public ItemNotFoundException(HttpStatus status, String reason) {
-        super(status.NOT_FOUND, reason);
+        super(HttpStatus.NOT_FOUND, reason);
     }
 }
