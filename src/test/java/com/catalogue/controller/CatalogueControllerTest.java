@@ -1,6 +1,8 @@
 package com.catalogue.controller;
 
+import com.catalogue.dto.ApiErrorResponse;
 import com.catalogue.dto.CatalogueItemResponse;
+import com.catalogue.exceptions.DatabaseEmptyException;
 import com.catalogue.models.CatalogueItem;
 import com.catalogue.service.CatalogueService;
 import org.junit.Test;
@@ -46,6 +48,20 @@ public class CatalogueControllerTest {
                 .expectNext(new CatalogueItemResponse(1111L, "TLG-SKU-0011", "ITEM 0010", "ITEM DESC 0010", "Books", 1000.0, now, now))
                 .expectComplete()
                 .verify();
+    }
+
+    @Test
+    public void testGetCatalogueItemsWhenDatabaseEmpty() {
+
+        when(catalogueService.getCatalogueItems()).thenReturn(Flux.error(new DatabaseEmptyException("Database Empty")));
+
+        webTestClient.get()
+                .uri("/api/v1/stream")
+                .exchange()
+                .expectStatus().isNoContent()
+                .returnResult(ApiErrorResponse.class)
+                .getResponseBody();
+
     }
 
     @Test
@@ -103,15 +119,15 @@ public class CatalogueControllerTest {
 
         given(catalogueService.removeCatalogueItem(any()))
                 .willReturn(Mono.empty());
-        StepVerifier.create(webTestClient.
-                        delete()
-                        .uri("/api/v1/TLG-SKU-0010")
-                        .exchange()
-                        .expectStatus()
-                        .isNoContent()
-                        .returnResult(Void.class)
-                        .getResponseBody())
-                .expectComplete().verify();
+        webTestClient.
+                delete()
+                .uri("/api/v1/TLG-SKU-0010")
+                .exchange()
+                .expectStatus()
+                .isNoContent()
+                .returnResult(Void.class)
+                .getResponseBody();
     }
+
 
 }
