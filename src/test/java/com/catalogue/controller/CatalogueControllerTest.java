@@ -60,7 +60,7 @@ public class CatalogueControllerTest {
                 .exchange()
                 .expectStatus().isNoContent()
                 .returnResult(ApiErrorResponse.class)
-                .getResponseBody();
+                .getResponseBody().toStream().forEach(System.out::println);
 
     }
 

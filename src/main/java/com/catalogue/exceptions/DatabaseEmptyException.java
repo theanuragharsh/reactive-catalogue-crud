@@ -5,6 +5,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 public class DatabaseEmptyException extends ResponseStatusException {
     public DatabaseEmptyException(String reason) {
-        super(HttpStatus.NO_CONTENT, reason);
+        super(HttpStatus.NOT_FOUND, reason);
     }
 }

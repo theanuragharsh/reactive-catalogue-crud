@@ -35,11 +35,11 @@ public class GlobalExceptionHandler extends RuntimeException {
     }
 
     @ExceptionHandler(value = DatabaseEmptyException.class)
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
     public ResponseEntity<HashMap<String, List<ApiErrorResponse>>> databaseEmptyException(DatabaseEmptyException databaseEmptyException) {
         log.error("Database Empty exception occurred: {} ", databaseEmptyException.getMessage());
         HashMap<String, List<ApiErrorResponse>> errors = new HashMap<>();
-        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder().category(API_ERROR).status(HttpStatus.NO_CONTENT)
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder().category(API_ERROR).status(HttpStatus.NOT_FOUND)
                 .message(databaseEmptyException.getReason()).timestamp(LocalDateTime.now()).build();
         errors.put(ERRORS, List.of(apiErrorResponse));
         return new ResponseEntity<>(errors, databaseEmptyException.getStatusCode());
