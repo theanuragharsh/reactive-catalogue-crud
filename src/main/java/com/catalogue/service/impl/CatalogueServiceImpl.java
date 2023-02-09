@@ -133,7 +133,7 @@ public class CatalogueServiceImpl implements CatalogueService {
     public Mono<Void> removeCatalogueItem(String sku) {
         return this.catalogueRepository.deleteBySku(sku)
                 .doOnError(ItemNotFoundException.class, ex -> log.warn("Catalogue Item {} was not found", sku))
-                .then();
+                .thenEmpty(Mono.empty());
     }
 
     /**
