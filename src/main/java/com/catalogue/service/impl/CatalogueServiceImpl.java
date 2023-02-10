@@ -104,7 +104,8 @@ public class CatalogueServiceImpl implements CatalogueService {
     }*/
     @Override
     public Mono<CatalogueItemResponse> updateCatalogueItem(String sku, CatalogueItem catalogueItem) {
-        return this.catalogueRepository.findBySku(sku)
+        return this.catalogueRepository
+                .findBySku(sku)
                 .switchIfEmpty(Mono.error(new ItemNotFoundException("Content not found")))
                 .flatMap(existingItem -> {
                     log.info(" Item {} found : updating", sku);
