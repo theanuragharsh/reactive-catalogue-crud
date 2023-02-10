@@ -6,10 +6,14 @@ import com.catalogue.exceptions.DatabaseEmptyException;
 import com.catalogue.models.CatalogueItem;
 import com.catalogue.service.CatalogueService;
 import org.junit.Test;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -25,6 +29,8 @@ import static org.mockito.Mockito.when;
 
 @WebFluxTest(CatalogueController.class)
 @RunWith(SpringRunner.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CatalogueControllerTest {
 
     @MockBean
@@ -35,6 +41,7 @@ public class CatalogueControllerTest {
     private final Instant now = Instant.now().truncatedTo(ChronoUnit.MINUTES);
 
     @Test
+    @Order(1)
     public void testGetCatalogueItems() {
         Flux<CatalogueItemResponse> catalogueItemResponseFlux = Flux
                 .just(new CatalogueItemResponse(1000L, "TLG-SKU-0010", "ITEM 0010", "ITEM DESC 0010", "Books", 1000.0, now, now),
@@ -51,6 +58,7 @@ public class CatalogueControllerTest {
     }
 
     @Test
+    @Order(2)
     public void testGetCatalogueItemsWhenDatabaseEmpty() {
 
         when(catalogueService.getCatalogueItems()).thenReturn(Flux.error(new DatabaseEmptyException("Database Empty")));
@@ -64,6 +72,7 @@ public class CatalogueControllerTest {
     }
 
     @Test
+    @Order(3)
     public void testFindById() {
 
         Mono<CatalogueItemResponse> catalogueItemResponse = Mono.just(CatalogueItemResponse.builder()
@@ -79,6 +88,7 @@ public class CatalogueControllerTest {
     }
 
     @Test
+    @Order(4)
     public void testFindBySku() {
 
         Mono<CatalogueItemResponse> catalogueItemResponse = Mono.just(CatalogueItemResponse.builder()
@@ -94,6 +104,7 @@ public class CatalogueControllerTest {
     }
 
     @Test
+    @Order(5)
     public void testCreateCatalogueItem() {
         // Given
         CatalogueItem catalogueItem = new CatalogueItem(1L, "TLG-SKU-0001", "ITEM 0001", "ITEM DESC 0001", "Books", 1000.0, 1, now, null);
@@ -114,6 +125,7 @@ public class CatalogueControllerTest {
     }
 
     @Test
+    @Order(6)
     public void testRemoveCatalogueItem() {
 
         given(catalogueService.removeCatalogueItem(any()))
@@ -129,6 +141,7 @@ public class CatalogueControllerTest {
     }
 
     @Test
+    @Order(7)
     public void testUpdateCatalogueItem() {
         CatalogueItem requestedCatalogueItem = new CatalogueItem(1L, "TLG-SKU-0001", "ITEM 0001", "ITEM DESC 0001", "Books", 1000.0, 1, now, now);
 
