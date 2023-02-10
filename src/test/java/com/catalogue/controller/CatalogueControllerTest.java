@@ -10,7 +10,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -18,7 +17,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -130,5 +128,35 @@ public class CatalogueControllerTest {
                 .getResponseBody();
     }
 
+    @Test
+    public void testUpdateCatalogueItem() {
+        CatalogueItem requestedCatalogueItem = new CatalogueItem(1L, "TLG-SKU-0001", "ITEM 0001", "ITEM DESC 0001", "Books", 1000.0, 1, now, now);
+
+        CatalogueItemResponse expectedCatalogueItemResponse = CatalogueItemResponse.builder()
+                .id(requestedCatalogueItem.getId())
+                .category(requestedCatalogueItem.getCategory())
+                .sku(requestedCatalogueItem.getSku())
+                .description(requestedCatalogueItem.getDescription())
+                .name(requestedCatalogueItem.getName())
+                .price(requestedCatalogueItem.getPrice())
+                .createdOn(requestedCatalogueItem.getCreatedOn())
+                .updatedOn(requestedCatalogueItem.getUpdatedOn())
+                .build();
+        when(catalogueService
+                .updateCatalogueItem(requestedCatalogueItem.getSku(), requestedCatalogueItem))
+                .thenReturn(Mono.just(expectedCatalogueItemResponse));
+        Flux<CatalogueItemResponse> responseBody = webTestClient
+                .put()
+                .uri("/api/v1/TLG-SKU-0001")
+                .bodyValue(requestedCatalogueItem)
+                .exchange()
+                .expectStatus().isOk()
+                .returnResult(CatalogueItemResponse.class)
+                .getResponseBody();
+
+        StepVerifier.create(responseBody).expectNext(expectedCatalogueItemResponse)
+                .expectComplete()
+                .verify();
+    }
 
 }
