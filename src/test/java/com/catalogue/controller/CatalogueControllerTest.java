@@ -3,6 +3,7 @@ package com.catalogue.controller;
 import com.catalogue.dto.ApiErrorResponse;
 import com.catalogue.dto.CatalogueItemResponse;
 import com.catalogue.exceptions.DatabaseEmptyException;
+import com.catalogue.exceptions.ItemNotFoundException;
 import com.catalogue.models.CatalogueItem;
 import com.catalogue.service.CatalogueService;
 import org.junit.Test;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -88,7 +90,17 @@ public class CatalogueControllerTest {
     }
 
     @Test
-    @Order(4)
+    @Order(40)
+    public void testFindByIdWhenItemNotFound() {
+
+        when(catalogueService.findById(ArgumentMatchers.anyLong())).thenReturn(Mono.error(() -> new ItemNotFoundException("Content not found")));
+        StepVerifier.create(catalogueService.findById(1L))
+                .expectError(ItemNotFoundException.class)
+                .verify();
+    }
+
+    @Test
+    @Order(50)
     public void testFindBySku() {
 
         Mono<CatalogueItemResponse> catalogueItemResponse = Mono.just(CatalogueItemResponse.builder()
@@ -104,7 +116,7 @@ public class CatalogueControllerTest {
     }
 
     @Test
-    @Order(5)
+    @Order(60)
     public void testCreateCatalogueItem() {
         // Given
         CatalogueItem catalogueItem = new CatalogueItem(1L, "TLG-SKU-0001", "ITEM 0001", "ITEM DESC 0001", "Books", 1000.0, 1, now, null);
@@ -125,7 +137,7 @@ public class CatalogueControllerTest {
     }
 
     @Test
-    @Order(6)
+    @Order(70)
     public void testRemoveCatalogueItem() {
 
         given(catalogueService.removeCatalogueItem(any()))
@@ -141,7 +153,7 @@ public class CatalogueControllerTest {
     }
 
     @Test
-    @Order(7)
+    @Order(80)
     public void testUpdateCatalogueItem() {
         String sku = "TLG-SKU-0001";
         CatalogueItem catalogueItem = new CatalogueItem(1L, sku, "ITEM 0001", "ITEM DESC 0001", "Books", 1000.0, 1, now, now);
