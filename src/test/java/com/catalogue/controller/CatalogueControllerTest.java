@@ -6,6 +6,7 @@ import com.catalogue.exceptions.DatabaseEmptyException;
 import com.catalogue.exceptions.ItemNotFoundException;
 import com.catalogue.models.CatalogueItem;
 import com.catalogue.service.CatalogueService;
+import com.catalogue.util.CatalogueItemGenerator;
 import org.junit.Test;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -41,6 +42,10 @@ public class CatalogueControllerTest {
     private WebTestClient webTestClient;
 
     private final Instant now = Instant.now().truncatedTo(ChronoUnit.MINUTES);
+    private final CatalogueItem catalogueItem = CatalogueItemGenerator.createItem();
+    private final CatalogueItemResponse catalogueItemResponse = CatalogueItemGenerator.createItemResponse();
+    private final CatalogueItem updateItemRequest = CatalogueItemGenerator.updateItemPriceRequest();
+    private final CatalogueItemResponse updatedItemResponse = CatalogueItemGenerator.updatedItemPriceResponse();
 
     @Test
     @Order(1)
@@ -77,14 +82,10 @@ public class CatalogueControllerTest {
     @Order(3)
     public void testFindById() {
 
-        Mono<CatalogueItemResponse> catalogueItemResponse = Mono.just(CatalogueItemResponse.builder()
-                .id(1000L).sku("TLG-SKU-0010").name("ITEM 0010").description("ITEM DESC 0010").category("Books").price(1000.0).createdOn(now).updatedOn(now)
-                .build());
-
-        when(catalogueService.findById(1000L)).thenReturn(catalogueItemResponse);
+        when(catalogueService.findById(1000L)).thenReturn(Mono.just(catalogueItemResponse));
         Flux<CatalogueItemResponse> responseBody = webTestClient.get().uri("/api/v1/id/1000").exchange().expectStatus().is2xxSuccessful().returnResult(CatalogueItemResponse.class).getResponseBody();
         StepVerifier.create(responseBody)
-                .expectNext(new CatalogueItemResponse(1000L, "TLG-SKU-0010", "ITEM 0010", "ITEM DESC 0010", "Books", 1000.0, now, now))
+                .expectNext(catalogueItemResponse)
                 .expectComplete()
                 .verify();
     }
@@ -103,15 +104,11 @@ public class CatalogueControllerTest {
     @Order(50)
     public void testFindBySku() {
 
-        Mono<CatalogueItemResponse> catalogueItemResponse = Mono.just(CatalogueItemResponse.builder()
-                .id(1000L).sku("TLG-SKU-0010").name("ITEM 0010").description("ITEM DESC 0010").category("Books").price(1000.0).createdOn(now).updatedOn(now)
-                .build());
-
-        when(catalogueService.findBySku("TLG-SKU-0010")).thenReturn(catalogueItemResponse);
+        when(catalogueService.findBySku("TLG-SKU-0010")).thenReturn(Mono.just(catalogueItemResponse));
 
         Flux<CatalogueItemResponse> responseBody = webTestClient.get().uri("/api/v1/sku/TLG-SKU-0010").exchange().expectStatus().is2xxSuccessful().returnResult(CatalogueItemResponse.class).getResponseBody();
         StepVerifier.create(responseBody)
-                .expectNext(new CatalogueItemResponse(1000L, "TLG-SKU-0010", "ITEM 0010", "ITEM DESC 0010", "Books", 1000.0, now, now))
+                .expectNext(catalogueItemResponse)
                 .expectComplete().verify();
     }
 
@@ -119,8 +116,6 @@ public class CatalogueControllerTest {
     @Order(60)
     public void testCreateCatalogueItem() {
         // Given
-        CatalogueItem catalogueItem = new CatalogueItem(1L, "TLG-SKU-0001", "ITEM 0001", "ITEM DESC 0001", "Books", 1000.0, 1, now, null);
-        CatalogueItemResponse catalogueItemResponse = new CatalogueItemResponse(1L, "TLG-SKU-0001", "ITEM 0001", "ITEM DESC 0001", "Books", 1000.0, now, null);
         when(catalogueService.createCatalogueItem(catalogueItem)).thenReturn(Mono.just(catalogueItemResponse));
 
         // When
@@ -155,20 +150,17 @@ public class CatalogueControllerTest {
     @Test
     @Order(80)
     public void testUpdateCatalogueItem() {
-        String sku = "TLG-SKU-0001";
-        CatalogueItem catalogueItem = new CatalogueItem(1L, sku, "ITEM 0001", "ITEM DESC 0001", "Books", 1000.0, 1, now, now);
-        CatalogueItemResponse expectedResponse = new CatalogueItemResponse(1L, sku, "ITEM 0001", "ITEM DESC 0001", "Books", 1000.0, now, now);
+        String sku = updateItemRequest.getSku();
 
-        when(catalogueService.updateCatalogueItem(sku, catalogueItem)).thenReturn(Mono.just(expectedResponse));
+        when(catalogueService.updateCatalogueItem(sku, updateItemRequest)).thenReturn(Mono.just(updatedItemResponse));
 
         webTestClient
                 .put()
                 .uri(String.format("/api/v1/%s", sku))
-                .body(Mono.just(catalogueItem), CatalogueItem.class)
+                .body(Mono.just(updateItemRequest), CatalogueItem.class)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(CatalogueItemResponse.class)
-                .isEqualTo(expectedResponse);
+                .isEqualTo(updatedItemResponse);
     }
-
 }
