@@ -81,7 +81,7 @@ public class CatalogueControllerTest {
     public void testFindById() {
 
         when(catalogueService.findById(1000L)).thenReturn(Mono.just(catalogueItemResponse));
-        Flux<CatalogueItemResponse> responseBody = webTestClient.get().uri("/api/v1/id/1000").exchange().expectStatus().is2xxSuccessful().returnResult(CatalogueItemResponse.class).getResponseBody();
+        Flux<CatalogueItemResponse> responseBody = webTestClient.get().uri("/api/v1/id/{id}", 1000).exchange().expectStatus().is2xxSuccessful().returnResult(CatalogueItemResponse.class).getResponseBody();
         StepVerifier.create(responseBody)
                 .expectNext(catalogueItemResponse)
                 .expectComplete()
@@ -102,9 +102,9 @@ public class CatalogueControllerTest {
     @Order(50)
     public void testFindBySku() {
 
-        when(catalogueService.findBySku("TLG-SKU-0010")).thenReturn(Mono.just(catalogueItemResponse));
+        when(catalogueService.findBySku(ArgumentMatchers.any())).thenReturn(Mono.just(catalogueItemResponse));
 
-        Flux<CatalogueItemResponse> responseBody = webTestClient.get().uri("/api/v1/sku/TLG-SKU-0010").exchange().expectStatus().is2xxSuccessful().returnResult(CatalogueItemResponse.class).getResponseBody();
+        Flux<CatalogueItemResponse> responseBody = webTestClient.get().uri("/api/v1/sku/{sku}", "TLG-SKU-0010").exchange().expectStatus().is2xxSuccessful().returnResult(CatalogueItemResponse.class).getResponseBody();
         StepVerifier.create(responseBody)
                 .expectNext(catalogueItemResponse)
                 .expectComplete().verify();
@@ -137,7 +137,7 @@ public class CatalogueControllerTest {
                 .willReturn(Mono.empty());
         webTestClient.
                 delete()
-                .uri("/api/v1/TLG-SKU-0010")
+                .uri("/api/v1/{sku}", "TLG-SKU-0010")
                 .exchange()
                 .expectStatus()
                 .isNoContent()
@@ -154,7 +154,7 @@ public class CatalogueControllerTest {
 
         webTestClient
                 .put()
-                .uri(String.format("/api/v1/%s", sku))
+                .uri("/api/v1/{sku}", sku)
                 .body(Mono.just(updateItemRequest), CatalogueItem.class)
                 .exchange()
                 .expectStatus().isOk()
