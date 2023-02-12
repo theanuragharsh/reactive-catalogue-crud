@@ -19,8 +19,6 @@ import java.util.List;
 @ControllerAdvice
 public class GlobalExceptionHandler extends RuntimeException {
     private static final String API_ERROR = "API_ERROR";
-    private static final String MISSING_REQUIRED_PARAMETERS = "MISSING_REQUIRED_PARAMETERS";
-    private static final String INVALID_VALUE = "INVALID_VALUE";
     private static final String ERRORS = "errors";
 
     @ExceptionHandler(value = ItemNotFoundException.class)
