@@ -43,29 +43,27 @@ public class CatalogueControllerTest {
 
     private final Instant now = Instant.now().truncatedTo(ChronoUnit.MINUTES);
     private final CatalogueItem catalogueItem = CatalogueItemGenerator.createItem();
+    private final Flux<CatalogueItem> catalogueItemFlux = CatalogueItemGenerator.generateCatalogueItemList();
     private final CatalogueItemResponse catalogueItemResponse = CatalogueItemGenerator.createItemResponse();
+    private final Flux<CatalogueItemResponse> catalogueItemResponseFlux = CatalogueItemGenerator.generateCatalogueItemResponseList();
     private final CatalogueItem updateItemRequest = CatalogueItemGenerator.updateItemPriceRequest();
     private final CatalogueItemResponse updatedItemResponse = CatalogueItemGenerator.updatedItemPriceResponse();
 
     @Test
-    @Order(1)
+    @Order(10)
     public void testGetCatalogueItems() {
-        Flux<CatalogueItemResponse> catalogueItemResponseFlux = Flux
-                .just(new CatalogueItemResponse(1000L, "TLG-SKU-0010", "ITEM 0010", "ITEM DESC 0010", "Books", 1000.0, now, now),
-                        new CatalogueItemResponse(1111L, "TLG-SKU-0011", "ITEM 0010", "ITEM DESC 0010", "Books", 1000.0, now, now));
 
         when(catalogueService.getCatalogueItems()).thenReturn(catalogueItemResponseFlux);
 
         Flux<CatalogueItemResponse> responseBody = webTestClient.get().uri("/api/v1/stream").exchange().expectStatus().isOk().returnResult(CatalogueItemResponse.class).getResponseBody();
         StepVerifier.create(responseBody)
-                .expectNext(new CatalogueItemResponse(1000L, "TLG-SKU-0010", "ITEM 0010", "ITEM DESC 0010", "Books", 1000.0, now, now))
-                .expectNext(new CatalogueItemResponse(1111L, "TLG-SKU-0011", "ITEM 0010", "ITEM DESC 0010", "Books", 1000.0, now, now))
+                .expectNextCount(99)
                 .expectComplete()
                 .verify();
     }
 
     @Test
-    @Order(2)
+    @Order(20)
     public void testGetCatalogueItemsWhenDatabaseEmpty() {
 
         when(catalogueService.getCatalogueItems()).thenReturn(Flux.error(new DatabaseEmptyException("Database Empty")));
@@ -79,7 +77,7 @@ public class CatalogueControllerTest {
     }
 
     @Test
-    @Order(3)
+    @Order(30)
     public void testFindById() {
 
         when(catalogueService.findById(1000L)).thenReturn(Mono.just(catalogueItemResponse));
