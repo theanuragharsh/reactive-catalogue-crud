@@ -200,7 +200,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8081/api/v1/CTLG-123-0001",
+					"raw": "http://localhost:8081/api/v1/sku/CTLG-123-0001",
 					"protocol": "http",
 					"host": [
 						"localhost"
