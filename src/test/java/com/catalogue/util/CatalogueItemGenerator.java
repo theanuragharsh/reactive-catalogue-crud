@@ -15,7 +15,7 @@ public class CatalogueItemGenerator {
     private static final Instant now = Instant.now().truncatedTo(ChronoUnit.MINUTES);
 
     /**
-     * Generate sample Catalogue Item which will be used in test classes
+     * Generate sample Catalogue Item which will be used in test classes for testing purposes
      *
      * @return Flux<CatalogueItem>
      */
