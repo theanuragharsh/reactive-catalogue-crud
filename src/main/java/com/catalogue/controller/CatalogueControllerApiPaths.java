@@ -1,11 +1,8 @@
 package com.catalogue.controller;
 
-import lombok.Data;
 import lombok.experimental.UtilityClass;
-import org.springframework.beans.factory.annotation.Value;
 
 @UtilityClass
-@Data
 public class CatalogueControllerApiPaths {
 
     public static final String BASE_PATH = "/api/v1";
