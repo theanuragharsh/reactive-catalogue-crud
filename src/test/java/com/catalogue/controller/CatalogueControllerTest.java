@@ -111,7 +111,7 @@ public class CatalogueControllerTest {
     }
 
     @Test
-    public void findBySkuWhenNotPresent() {
+    public void testFindBySkuWhenNotPresent() {
         when(catalogueService.findBySku(ArgumentMatchers.any())).thenReturn(Mono.error(() -> new ItemNotFoundException("SKU not found")));
         Flux<ApiErrorResponse> responseBody = webTestClient.get().uri("/api/v1/sku/{sku}", "TLG-SKU-0010").exchange()
                 .expectStatus().isNotFound().returnResult(ApiErrorResponse.class).getResponseBody();
