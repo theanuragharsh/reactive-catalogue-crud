@@ -92,9 +92,10 @@ public class CatalogueControllerTest {
     @Order(40)
     public void testFindByIdWhenItemNotFound() {
 
-        when(catalogueService.findById(ArgumentMatchers.anyLong())).thenReturn(Mono.error(() -> new ItemNotFoundException("Content not found")));
+        when(catalogueService.findById(ArgumentMatchers.anyLong())).thenReturn(Mono.error(new ItemNotFoundException("Content not found")));
         StepVerifier.create(catalogueService.findById(1L))
-                .expectError(ItemNotFoundException.class)
+                .expectErrorMatches(throwable -> throwable instanceof ItemNotFoundException &&
+                        ((ItemNotFoundException) throwable).getReason().equals("Content not found"))
                 .verify();
     }
 
@@ -112,7 +113,7 @@ public class CatalogueControllerTest {
 
     @Test
     public void testFindBySkuWhenNotPresent() {
-        when(catalogueService.findBySku(ArgumentMatchers.any())).thenReturn(Mono.error(() -> new ItemNotFoundException("SKU not found")));
+        when(catalogueService.findBySku(ArgumentMatchers.any())).thenReturn(Mono.error(new ItemNotFoundException("SKU not found")));
         Flux<ApiErrorResponse> responseBody = webTestClient.get().uri("/api/v1/sku/{sku}", "TLG-SKU-0010").exchange()
                 .expectStatus().isNotFound().returnResult(ApiErrorResponse.class).getResponseBody();
     }
