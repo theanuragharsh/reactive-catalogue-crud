@@ -16,6 +16,7 @@ import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -126,6 +127,7 @@ public class CatalogueControllerTest {
 
         // When
         StepVerifier.create(webTestClient.post().uri("/api/v1/")
+                        .accept(MediaType.APPLICATION_JSON)
                         .bodyValue(catalogueItem)
                         .exchange()
                         .expectStatus()
@@ -164,6 +166,7 @@ public class CatalogueControllerTest {
                 .put()
                 .uri("/api/v1/{sku}", sku)
                 .body(Mono.just(updateItemRequest), CatalogueItem.class)
+                .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(CatalogueItemResponse.class)
